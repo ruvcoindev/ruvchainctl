@@ -1,4 +1,6 @@
-[package]
+
+[package]cargo-features = ["edition2024"]
+
 name = "ruvchainctl"
 version = "1.0.0"
 authors = ["ruvcoindev <admin@ruvcha.in>"]
