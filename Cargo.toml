@@ -1,0 +1,28 @@
+[package]
+name = "ruvchainctl"
+version = "1.0.0"
+authors = ["ruvcoindev <admin@ruvcha.in>"]
+categories = ["network-programming"]
+description = "Admin API Ruvchain Network library"
+edition = "2025"
+keywords = ["ruvchain", "ruvchain network", "ruvchainctl"]
+license = "MIT"
+repository = "https://github.com/ruvcoindev/ruvchainctl"
+resolver = "2" # Disallow feature unification
+
+[features]
+# Take `Write` and `Read` traits from `std` crate
+use_std = [ "dep:maybe-async", "maybe-async?/is_sync" ]
+# Take `AsyncWrite` and `AsyncRead` traits from `tokio` crate
+use_tokio = [ "dep:maybe-async", "dep:tokio" ]
+# Take `AsyncWrite` and `AsyncRead` traits from `futures` crate
+use_futures = [ "dep:maybe-async",  "dep:futures" ]
+default = [ "use_std" ]
+
+[dependencies]
+serde = { version = "1", features = [ "derive" ] }
+serde_json = "1"
+maybe-async = { version = "0", optional = true }
+# Async runtime
+futures = { version = "0", optional = true }
+tokio = { version = "1", features = [ "io-util", "net", "macros", "rt" ], optional = true }
