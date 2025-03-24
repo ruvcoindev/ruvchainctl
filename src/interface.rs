@@ -374,52 +374,6 @@ impl<S: AsyncWrite + AsyncRead + Unpin> Endpoint<S> {
         }
     }
     #[maybe_async]
-    pub async fn get_dht(&mut self) -> RequestResult<Vec<DHTEntry>> {
-        match self.router_version {
-            RouterVersion::__v0_4_4 => {
-                #[derive(Debug, Deserialize)]
-                #[cfg_attr(test, serde(deny_unknown_fields))]
-                struct Entry {
-                    key: String,
-                    pub port: u64,
-                    pub rest: u64,
-                }
-                #[derive(Debug, Deserialize)]
-                #[cfg_attr(test, serde(deny_unknown_fields))]
-                struct Dht {
-                    dht: HashMap<Ipv6Addr, Entry>,
-                }
-                match self.request::<Dht>("getdht").await? {
-                    Ok(dht) => {
-                        let vec = dht
-                            .dht
-                            .into_iter()
-                            .map(|(k, v)| DHTEntry {
-                                address: k,
-                                key: v.key,
-                                port: v.port,
-                                rest: v.rest,
-                            })
-                            .collect();
-                        Ok(Ok(vec))
-                    }
-                    Err(err) => Ok(Err(err)),
-                }
-            }
-            // Not implemented in the router after v0.5.0
-            RouterVersion::v0_4_5__v0_4_7 | RouterVersion::v0_5_0__ => {
-                #[derive(Debug, Deserialize)]
-                #[cfg_attr(test, serde(deny_unknown_fields))]
-                struct Dht {
-                    dht: Vec<DHTEntry>,
-                }
-                self.request::<Dht>("getdht")
-                    .await
-                    .map(|e| e.map(|e| e.dht))
-            }
-        }
-    }
-    #[maybe_async]
     pub async fn get_node_info(&mut self, key: String) -> RequestResult<HashMap<String, Value>> {
         let args = hash_map! {
             ("key".into()): key.into()
